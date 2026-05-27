@@ -5,7 +5,6 @@ const NavMenu = ({ open, onClose, navigate, currentPage }) => {
   return (
     <Overlay $open={open} aria-hidden={!open}>
       <Top>
-        <Logo onClick={() => navigate('home')}>My Lost Archive</Logo>
         <CloseBtn onClick={onClose} aria-label="Close menu">
           <span /><span />
         </CloseBtn>
@@ -43,21 +42,10 @@ const Overlay = styled.div`
 const Top = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   height: 64px;
   margin-bottom: 2rem;
   flex-shrink: 0;
-`
-
-const Logo = styled.button`
-  font-family: 'Libre Caslon Text', serif;
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--text-dark);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
 `
 
 const CloseBtn = styled.button`
