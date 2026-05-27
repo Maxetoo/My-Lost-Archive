@@ -1,0 +1,57 @@
+:root {
+    /* colors */
+    --background-color: #fdfdfb;
+    --primary-color: #F4B57A;
+    --secondary-color: #8C8379;
+    --neutral-color: #32302E;
+    --stroke-color: #000000;
+    --white-color: #ffffff;
+    --text-dark: #1a1a1a;
+    --text-muted: #777370;
+    --divider-color: #f2efea;
+    --border-color: #e5e1d8;
+    --surface-color: #eae7df;
+    /* typography */
+    --font-size-base: 16px;
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.82rem;
+    --font-size-md: 0.9rem;
+    --font-size-lg: 1rem;
+    --font-size-xl: 1.1rem;
+    --font-size-xxl: 1.7rem;
+    /* font weight  */
+    --font-weight-normal: 400;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --line-height-base: 1.6;
+    /* spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 0.75rem;
+    --spacing-md: 1.25rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2.5rem;
+    /* border radius */
+    --border-radius-sm: 8px;
+    --border-radius-md: 14px;
+    --border-radius-lg: 20px;
+    --border-radius-pill: 50px;
+    /* shadows */
+    --shadow-card: 0 24px 80px rgba(0, 0, 0, 0.18);
+    /* transitions */
+    --transition-fast: 150ms ease;
+    --transition-normal: 300ms ease;
+    /* z-index */
+    --z-fixed: 500;
+}
+
+[data-theme="dark"] {
+    --background-color: #161514;
+    --text-dark: #f0ede8;
+    --text-muted: #9a9590;
+    --secondary-color: #8a8480;
+    --neutral-color: #c8c4bf;
+    --divider-color: #252321;
+    --border-color: #2e2c2a;
+    --surface-color: #242220;
+    --white-color: #1e1c1a;
+}
