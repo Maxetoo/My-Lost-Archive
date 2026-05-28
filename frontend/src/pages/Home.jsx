@@ -53,7 +53,7 @@ const Home = () => {
             <SearchIcon />
             <input
               type="text"
-              placeholder="Search through my mind…"
+              placeholder="Search through my archives…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               aria-label="Search"

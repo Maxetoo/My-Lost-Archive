@@ -35,13 +35,13 @@ const BlogFeed = () => {
     <Page>
       <Container>
         <PageHeader>
-          <PageTitle>My Mind</PageTitle>
+          <PageTitle>Explore my mind</PageTitle>
 
           <SearchBar>
             <SearchIcon />
             <input
               type="text"
-              placeholder="Search through my mind…"
+              placeholder="Search through my archives…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               aria-label="Search"
