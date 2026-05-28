@@ -1,16 +1,15 @@
+import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { navData } from '../../data/navData'
 
-const Footer = ({ navigate }) => {
+const Footer = () => {
   return (
     <Wrapper>
-<Inner>
+      <Inner>
         <Bottom>
           <Links aria-label="Footer navigation">
-            {navData.map(({ _id, title, page }) => (
-              <LinkBtn key={_id} onClick={() => navigate(page)}>
-                {title}
-              </LinkBtn>
+            {navData.map(({ _id, title, path }) => (
+              <FooterLink key={_id} to={path}>{title}</FooterLink>
             ))}
           </Links>
           <Copy>© {new Date().getFullYear()} My Lost Archive. All rights reserved.</Copy>
@@ -50,14 +49,11 @@ const Links = styled.nav`
   gap: 1.5rem;
 `
 
-const LinkBtn = styled.button`
-  background: none;
-  border: none;
-  cursor: pointer;
+const FooterLink = styled(Link)`
   font-size: 0.875rem;
   font-family: 'DM Sans', sans-serif;
   color: var(--neutral-color);
-  padding: 0;
+  text-decoration: none;
   opacity: 0.65;
   transition: opacity 150ms ease;
 

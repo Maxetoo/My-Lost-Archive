@@ -1,8 +1,9 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
-import { feedItems } from '../../data/mockData'
 import BlogCard from './BlogCard'
 import AudioCard from './AudioCard'
+import { usePosts } from '../../contexts/PostsContext'
 
 const SearchIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -17,10 +18,12 @@ const ChevronIcon = () => (
   </svg>
 )
 
-const BlogFeed = ({ navigate }) => {
+const BlogFeed = () => {
+  const navigate = useNavigate()
+  const posts = usePosts()
   const [query, setQuery] = useState('')
 
-  const visible = feedItems.filter((item) =>
+  const visible = posts.filter((item) =>
     item.title.toLowerCase().includes(query.toLowerCase())
   )
 
@@ -57,7 +60,7 @@ const BlogFeed = ({ navigate }) => {
               {item.type === 'article' ? (
                 <BlogCard
                   post={item}
-                  onClick={() => navigate('article', item)}
+                  onClick={() => navigate(`/blog/${item.id}`)}
                 />
               ) : (
                 <AudioCard item={item} />

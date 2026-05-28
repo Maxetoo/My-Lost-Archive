@@ -1,7 +1,8 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
-import { articles } from '../data/mockData'
 import BlogCard from '../components/blog/BlogCard'
+import { usePosts } from '../contexts/PostsContext'
 
 const SearchIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -16,15 +17,18 @@ const ChevronIcon = () => (
   </svg>
 )
 
-const Home = ({ navigate }) => {
+const Home = () => {
+  const navigate = useNavigate()
+  const posts = usePosts()
   const [query, setQuery] = useState('')
 
+  const articles = posts.filter((p) => p.type === 'article')
   const visible = articles.filter((a) =>
     a.title.toLowerCase().includes(query.toLowerCase())
   )
 
   return (
-    <>
+    <> 
       <HeroSection>
         <HeroInner>
           <HeroLabel>
@@ -71,14 +75,14 @@ const Home = ({ navigate }) => {
                   <BlogCard
                     key={article.id}
                     post={article}
-                    onClick={() => navigate('article', article)}
+                    onClick={() => navigate(`/blog/${article.id}`)}
                     $grid
                   />
                 ))}
               </FeaturedGrid>
-              {articles.length > 3 && (
+              {posts.length > 3 && (
                 <SeeAllRow>
-                  <SeeAllBtn onClick={() => navigate('blog')}>See All</SeeAllBtn>
+                  <SeeAllBtn onClick={() => navigate('/blog')}>See All</SeeAllBtn>
                 </SeeAllRow>
               )}
             </>

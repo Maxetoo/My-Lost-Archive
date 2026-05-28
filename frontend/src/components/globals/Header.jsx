@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 import { navData } from '../../data/navData'
 import NavMenu from './NavMenu'
@@ -23,27 +24,22 @@ const MoonIcon = () => (
   </svg>
 )
 
-const Header = ({ currentPage, navigate, isDark, onToggleTheme }) => {
+const Header = ({ isDark, onToggleTheme }) => {
   const [menuOpen, setMenuOpen] = useState(false)
-
-  const handleNav = (page) => {
-    navigate(page)
-    setMenuOpen(false)
-  }
 
   return (
     <>
       <Wrapper>
         <Inner>
           <Nav aria-label="Main navigation">
-            {navData.map(({ _id, title, page }) => (
-              <NavBtn
+            {navData.map(({ _id, title, path }) => (
+              <NavItem
                 key={_id}
-                $active={currentPage === page}
-                onClick={() => handleNav(page)}
+                to={path}
+                end={path === '/'}
               >
                 {title}
-              </NavBtn>
+              </NavItem>
             ))}
           </Nav>
 
@@ -64,8 +60,8 @@ const Header = ({ currentPage, navigate, isDark, onToggleTheme }) => {
       <NavMenu
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
-        navigate={handleNav}
-        currentPage={currentPage}
+        isDark={isDark}
+        onToggleTheme={onToggleTheme}
       />
     </>
   )
@@ -102,7 +98,7 @@ const Nav = styled.nav`
   }
 `
 
-const NavBtn = styled.button`
+const NavItem = styled(NavLink)`
   background: none;
   border: none;
   cursor: pointer;
@@ -110,11 +106,16 @@ const NavBtn = styled.button`
   font-family: 'DM Sans', sans-serif;
   color: var(--neutral-color);
   padding: 0;
-  opacity: ${({ $active }) => ($active ? 1 : 0.6)};
-  text-decoration: ${({ $active }) => ($active ? 'underline' : 'none')};
-  text-decoration-thickness: 1.5px;
-  text-underline-offset: 5px;
+  text-decoration: none;
+  opacity: 0.6;
   transition: opacity 150ms ease;
+
+  &.active {
+    opacity: 1;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 8px;
+  }
 
   &:hover {
     opacity: 1;
@@ -133,6 +134,10 @@ const ThemeToggle = styled.button`
 
   &:hover {
     color: var(--primary-color);
+  }
+
+  @media (max-width: 768px) {
+    display: none;
   }
 `
 

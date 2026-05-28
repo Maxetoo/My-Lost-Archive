@@ -1,6 +1,9 @@
+import { useParams, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
-import { articles } from '../../data/mockData'
+import { documentToReactComponents } from '@contentful/rich-text-react-renderer'
+import { BLOCKS } from '@contentful/rich-text-types'
 import BlogCard from './BlogCard'
+import { usePosts } from '../../contexts/PostsContext'
 
 const BackIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="18" height="18" aria-hidden="true">
@@ -19,10 +22,15 @@ const ShareIcon = () => (
   </svg>
 )
 
-const BlogDetail = ({ post, navigate }) => {
-  if (!post) return null
+const BlogDetail = () => {
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const posts = usePosts()
 
-  const related = articles.filter((a) => a.id !== post.id)
+  const post = posts.find((p) => p.id === id)
+  const related = posts.filter((p) => p.id !== id)
+
+  if (!post) return null
 
   const handleShare = () => {
     if (navigator.share) {
@@ -36,7 +44,7 @@ const BlogDetail = ({ post, navigate }) => {
     <Page>
       <Container>
         <TopRow>
-          <BackBtn onClick={() => navigate('blog')}>
+          <BackBtn onClick={() => navigate('/blog')}>
             <BackIcon />
             Back to Blog
           </BackBtn>
@@ -62,9 +70,17 @@ const BlogDetail = ({ post, navigate }) => {
         <PostDate>{post.date}</PostDate>
 
         <Body>
-          {post.content.map((para, i) => (
-            <BodyText key={i}>{para}</BodyText>
-          ))}
+          {post.content && documentToReactComponents(post.content, {
+            renderNode: {
+              [BLOCKS.PARAGRAPH]: (node, children) => <BodyText>{children}</BodyText>,
+              [BLOCKS.HEADING_1]: (node, children) => <BodyHeading as="h1">{children}</BodyHeading>,
+              [BLOCKS.HEADING_2]: (node, children) => <BodyHeading as="h2">{children}</BodyHeading>,
+              [BLOCKS.HEADING_3]: (node, children) => <BodyHeading as="h3">{children}</BodyHeading>,
+              [BLOCKS.UL_LIST]: (node, children) => <BodyList>{children}</BodyList>,
+              [BLOCKS.OL_LIST]: (node, children) => <BodyList as="ol">{children}</BodyList>,
+              [BLOCKS.LIST_ITEM]: (node, children) => <BodyListItem>{children}</BodyListItem>,
+            },
+          })}
         </Body>
 
         {related.length > 0 && (
@@ -74,7 +90,7 @@ const BlogDetail = ({ post, navigate }) => {
               <BlogCard
                 key={item.id}
                 post={item}
-                onClick={() => navigate('article', item)}
+                onClick={() => navigate(`/blog/${item.id}`)}
               />
             ))}
           </ContinueSection>
@@ -236,6 +252,31 @@ const BodyText = styled.p`
   color: var(--text-muted);
   margin-bottom: 1rem;
   font-family: 'DM Sans', sans-serif;
+`
+
+const BodyHeading = styled.h2`
+  font-family: 'Libre Caslon Text', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 1.75rem 0 0.75rem;
+  line-height: 1.3;
+`
+
+const BodyList = styled.ul`
+  margin: 0 0 1rem 1.25rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.975rem;
+  line-height: 1.85;
+  color: var(--text-muted);
+`
+
+const BodyListItem = styled.li`
+  margin-bottom: 0.4rem;
+
+  p {
+    margin: 0;
+  }
 `
 
 const ContinueSection = styled.div`

@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import styled from 'styled-components'
 import Header from './components/globals/Header'
 import Footer from './components/globals/Footer'
 import Home from './pages/Home'
+import About from './pages/About'
 import BlogFeed from './components/blog/BlogFeed'
 import BlogDetail from './components/blog/BlogDetail'
+import { PostsProvider } from './contexts/PostsContext'
+import ScrollToTop from './helpers/ScrollToTop'
 
 const App = () => {
-  const [page, setPage] = useState('home')
-  const [selectedPost, setSelectedPost] = useState(null)
   const [isDark, setIsDark] = useState(() => localStorage.getItem('theme') === 'dark')
 
   useEffect(() => {
@@ -16,24 +18,26 @@ const App = () => {
     localStorage.setItem('theme', isDark ? 'dark' : 'light')
   }, [isDark])
 
-  const navigate = (targetPage, data = null) => {
-    setSelectedPost(data)
-    setPage(targetPage)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
   return (
-    <SiteLayout>
-      <Header currentPage={page} navigate={navigate} isDark={isDark} onToggleTheme={() => setIsDark(d => !d)} />
+    <BrowserRouter>
+      <PostsProvider>
+        <ScrollToTop />
+        <SiteLayout>
+          <Header isDark={isDark} onToggleTheme={() => setIsDark(d => !d)} />
 
-      <SiteMain>
-        {page === 'home' && <Home navigate={navigate} />}
-        {page === 'blog' && <BlogFeed navigate={navigate} />}
-        {page === 'article' && <BlogDetail post={selectedPost} navigate={navigate} />}
-      </SiteMain>
+          <SiteMain>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/blog" element={<BlogFeed />} />
+              <Route path="/blog/:id" element={<BlogDetail />} />
+            </Routes>
+          </SiteMain>
 
-      <Footer navigate={navigate} />
-    </SiteLayout>
+          <Footer />
+        </SiteLayout>
+      </PostsProvider>
+    </BrowserRouter>
   )
 }
 
