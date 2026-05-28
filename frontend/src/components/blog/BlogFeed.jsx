@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import BlogCard from './BlogCard'
 import AudioCard from './AudioCard'
-import { usePosts } from '../../contexts/PostsContext'
+import { usePosts, usePostsLoading } from '../../contexts/PostsContext'
+import BlogCardSkeleton from './BlogCardSkeleton'
 
 const SearchIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -12,32 +13,35 @@ const SearchIcon = () => (
   </svg>
 )
 
-const ChevronIcon = () => (
-  <svg viewBox="0 0 12 8" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="11" height="8" aria-hidden="true">
-    <path d="M1 1l5 5 5-5" />
-  </svg>
-)
+
+const SKELETON_COUNT = 5
 
 const BlogFeed = () => {
   const navigate = useNavigate()
   const posts = usePosts()
+  const loading = usePostsLoading()
   const [query, setQuery] = useState('')
+  const [activeCategory, setActiveCategory] = useState('All')
 
-  const visible = posts.filter((item) =>
-    item.title.toLowerCase().includes(query.toLowerCase())
-  )
+  const categories = ['All', ...new Set(posts.map((p) => p.category).filter(Boolean))]
+
+  const visible = posts.filter((item) => {
+    const matchesQuery = item.title.toLowerCase().includes(query.toLowerCase())
+    const matchesCategory = activeCategory === 'All' || item.category === activeCategory
+    return matchesQuery && matchesCategory
+  })
 
   return (
     <Page>
       <Container>
         <PageHeader>
-          <PageTitle>Blog</PageTitle>
+          <PageTitle>My Mind</PageTitle>
 
           <SearchBar>
             <SearchIcon />
             <input
               type="text"
-              placeholder="Search articles and podcasts…"
+              placeholder="Search through my mind…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               aria-label="Search"
@@ -45,29 +49,46 @@ const BlogFeed = () => {
           </SearchBar>
 
           <FilterRow>
-            <FilterBtn>
-              Newest <ChevronIcon />
-            </FilterBtn>
+            {categories.map((cat) => (
+              <FilterBtn
+                key={cat}
+                $active={activeCategory === cat}
+                onClick={() => setActiveCategory(cat)}
+              >
+                {cat}
+              </FilterBtn>
+            ))}
           </FilterRow>
         </PageHeader>
 
         <List>
-          {visible.length === 0 && (
-            <Empty>No results for "{query}"</Empty>
-          )}
-          {visible.map((item, idx) => (
-            <div key={item.id}>
-              {item.type === 'article' ? (
-                <BlogCard
-                  post={item}
-                  onClick={() => navigate(`/blog/${item.id}`)}
-                />
-              ) : (
-                <AudioCard item={item} />
+          {loading ? (
+            Array.from({ length: SKELETON_COUNT }).map((_, i) => (
+              <div key={i}>
+                <BlogCardSkeleton />
+                {i < SKELETON_COUNT - 1 && <Divider />}
+              </div>
+            ))
+          ) : (
+            <>
+              {visible.length === 0 && (
+                <Empty>No results for "{query}"</Empty>
               )}
-              {idx < visible.length - 1 && <Divider />}
-            </div>
-          ))}
+              {visible.map((item, idx) => (
+                <div key={item.id}>
+                  {item.type === 'article' ? (
+                    <BlogCard
+                      post={item}
+                      onClick={() => navigate(`/blog/${item.id}`)}
+                    />
+                  ) : (
+                    <AudioCard item={item} />
+                  )}
+                  {idx < visible.length - 1 && <Divider />}
+                </div>
+              ))}
+            </>
+          )}
         </List>
       </Container>
     </Page>
@@ -131,24 +152,26 @@ const SearchBar = styled.div`
 `
 
 const FilterRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   margin-bottom: 0.75rem;
 `
 
 const FilterBtn = styled.button`
-  background: none;
-  border: none;
+  background: ${({ $active }) => ($active ? 'var(--primary-color)' : 'none')};
+  border: 1px solid ${({ $active }) => ($active ? 'var(--primary-color)' : 'var(--border-color)')};
+  border-radius: 50px;
   cursor: pointer;
   font-family: 'DM Sans', sans-serif;
-  font-size: 0.9rem;
-  color: var(--text-dark);
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0;
-  transition: opacity 150ms ease;
+  font-size: 0.8rem;
+  color: ${({ $active }) => ($active ? '#fff' : 'var(--neutral-color)')};
+  padding: 0.3rem 0.9rem;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
 
   &:hover {
-    opacity: 0.65;
+    border-color: var(--primary-color);
+    color: ${({ $active }) => ($active ? '#fff' : 'var(--primary-color)')};
   }
 `
 

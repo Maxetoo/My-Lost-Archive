@@ -11,21 +11,21 @@ const SearchIcon = () => (
   </svg>
 )
 
-const ChevronIcon = () => (
-  <svg viewBox="0 0 12 8" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="11" height="8" aria-hidden="true">
-    <path d="M1 1l5 5 5-5" />
-  </svg>
-)
 
 const Home = () => {
   const navigate = useNavigate()
   const posts = usePosts()
   const [query, setQuery] = useState('')
+  const [activeCategory, setActiveCategory] = useState('All')
 
   const articles = posts.filter((p) => p.type === 'article')
-  const visible = articles.filter((a) =>
-    a.title.toLowerCase().includes(query.toLowerCase())
-  )
+  const categories = ['All', ...new Set(articles.map((a) => a.category).filter(Boolean))]
+
+  const visible = articles.filter((a) => {
+    const matchesQuery = a.title.toLowerCase().includes(query.toLowerCase())
+    const matchesCategory = activeCategory === 'All' || a.category === activeCategory
+    return matchesQuery && matchesCategory
+  })
 
   return (
     <> 
@@ -53,7 +53,7 @@ const Home = () => {
             <SearchIcon />
             <input
               type="text"
-              placeholder="Search articles…"
+              placeholder="Search through my mind…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               aria-label="Search"
@@ -61,9 +61,15 @@ const Home = () => {
           </SearchBar>
 
           <FilterRow>
-            <FilterBtn>
-              Newest <ChevronIcon />
-            </FilterBtn>
+            {categories.map((cat) => (
+              <FilterBtn
+                key={cat}
+                $active={activeCategory === cat}
+                onClick={() => setActiveCategory(cat)}
+              >
+                {cat}
+              </FilterBtn>
+            ))}
           </FilterRow>
 
           {visible.length === 0 ? (
@@ -220,24 +226,26 @@ const SearchBar = styled.div`
 `
 
 const FilterRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   margin-bottom: 2rem;
 `
 
 const FilterBtn = styled.button`
-  background: none;
-  border: none;
+  background: ${({ $active }) => ($active ? 'var(--primary-color)' : 'none')};
+  border: 1px solid ${({ $active }) => ($active ? 'var(--primary-color)' : 'var(--border-color)')};
+  border-radius: 50px;
   cursor: pointer;
   font-family: 'DM Sans', sans-serif;
-  font-size: 0.9rem;
-  color: var(--text-dark);
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0;
-  transition: opacity 150ms ease;
+  font-size: 0.8rem;
+  color: ${({ $active }) => ($active ? '#fff' : 'var(--neutral-color)')};
+  padding: 0.3rem 0.9rem;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
 
   &:hover {
-    opacity: 0.65;
+    border-color: var(--primary-color);
+    color: ${({ $active }) => ($active ? '#fff' : 'var(--primary-color)')};
   }
 `
 
