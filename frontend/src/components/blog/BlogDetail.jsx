@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { documentToReactComponents } from '@contentful/rich-text-react-renderer'
@@ -22,6 +23,21 @@ const ShareIcon = () => (
   </svg>
 )
 
+const setMeta = (property, content) => {
+  let el = document.querySelector(`meta[property="${property}"]`)
+  if (!el) {
+    el = document.createElement('meta')
+    el.setAttribute('property', property)
+    document.head.appendChild(el)
+  }
+  el.setAttribute('content', content)
+}
+
+const removeMeta = (property) => {
+  const el = document.querySelector(`meta[property="${property}"]`)
+  if (el) el.remove()
+}
+
 const BlogDetail = () => {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -29,6 +45,23 @@ const BlogDetail = () => {
 
   const post = posts.find((p) => p.id === id)
   const related = posts.filter((p) => p.id !== id)
+
+  useEffect(() => {
+    if (!post) return
+
+    document.title = post.title
+
+    setMeta('og:title', post.title)
+    setMeta('og:description', post.excerpt || '')
+    setMeta('og:url', window.location.href)
+    setMeta('og:type', 'article')
+    if (post.image) setMeta('og:image', post.image)
+
+    return () => {
+      document.title = 'My Lost Archive'
+      ;['og:title', 'og:description', 'og:url', 'og:type', 'og:image'].forEach(removeMeta)
+    }
+  }, [post])
 
   if (!post) return null
 
@@ -46,19 +79,19 @@ const BlogDetail = () => {
         <TopRow>
           <BackBtn onClick={() => navigate('/blog')}>
             <BackIcon />
-            Back to Blog
+            Back to Archive
           </BackBtn>
-          <ShareBtn onClick={handleShare} aria-label="Share post">
+          <ShareBtn onClick={handleShare}>
+            Share
             <ShareIcon />
           </ShareBtn>
         </TopRow>
 
-        <Hero>
-          <HeroImg src={post.image} alt={post.title} />
-          <HeroOverlay>
-            <HeroText>{post.heroText}</HeroText>
-          </HeroOverlay>
-        </Hero>
+        {post.image && (
+          <Hero>
+            <HeroImg src={post.image} alt={post.title} />
+          </Hero>
+        )}
 
         <PostMeta>
           <PostCategory>{post.category}</PostCategory>
@@ -137,6 +170,26 @@ const BackBtn = styled.button`
   }
 `
 
+const ShareBtn = styled.button`
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--secondary-color);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+  font-family: 'DM Sans', sans-serif;
+  padding: 0.45rem 0.85rem;
+  transition: color 150ms ease, border-color 150ms ease;
+
+  &:hover {
+    color: var(--text-dark);
+    border-color: var(--text-dark);
+  }
+`
+
 const Hero = styled.div`
   border-radius: 20px;
   overflow: hidden;
@@ -157,54 +210,11 @@ const HeroImg = styled.img`
   display: block;
 `
 
-const HeroOverlay = styled.div`
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: flex-end;
-  padding: 1.5rem 1.75rem;
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.62) 0%,
-    rgba(0, 0, 0, 0.18) 50%,
-    transparent 100%
-  );
-`
-
-const HeroText = styled.h2`
-  font-family: 'Libre Caslon Text', serif;
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: #fff;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  line-height: 0.95;
-
-  @media (max-width: 640px) {
-    font-size: 1.6rem;
-  }
-`
-
 const PostMeta = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
   margin-bottom: 0.9rem;
-`
-
-const ShareBtn = styled.button`
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--secondary-color);
-  display: flex;
-  align-items: center;
-  padding: 0;
-  transition: color 150ms ease;
-
-  &:hover {
-    color: var(--text-dark);
-  }
 `
 
 const PostCategory = styled.span`

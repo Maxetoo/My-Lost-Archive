@@ -10,7 +10,7 @@ const extractPlainText = (node) => {
 const calcReadTime = (richText) => {
   const text = extractPlainText(richText)
   const words = text.split(/\s+/).filter(Boolean).length
-  return `${Math.max(1, Math.round(words / 200))} min read`
+  return `${Math.max(1, Math.round(words / 238))} min read`
 }
 
 const mapPost = (entry) => {

@@ -11,6 +11,7 @@ const BlogCard = ({ post, onClick, $grid }) => (
     <Category>{post.category}</Category>
     <Title>{post.title}</Title>
     <Excerpt>{post.excerpt}</Excerpt>
+    {post.readTime && <ReadTime>{post.readTime}</ReadTime>}
   </Card>
 )
 
@@ -65,7 +66,13 @@ const Excerpt = styled.p`
   font-size: 0.875rem;
   line-height: 1.72;
   color: var(--text-muted);
-  margin-bottom: 1.1rem;
+  margin-bottom: 0.6rem;
+  font-family: 'DM Sans', sans-serif;
+`
+
+const ReadTime = styled.span`
+  font-size: 0.78rem;
+  color: var(--secondary-color);
   font-family: 'DM Sans', sans-serif;
 `
 
