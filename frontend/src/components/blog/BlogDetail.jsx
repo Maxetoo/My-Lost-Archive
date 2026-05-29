@@ -1,10 +1,10 @@
 import { useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 import { documentToReactComponents } from '@contentful/rich-text-react-renderer'
 import { BLOCKS } from '@contentful/rich-text-types'
 import BlogCard from './BlogCard'
-import { usePosts } from '../../contexts/PostsContext'
+import { usePosts, usePostsLoading } from '../../contexts/PostsContext'
 
 const BackIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="18" height="18" aria-hidden="true">
@@ -13,8 +13,9 @@ const BackIcon = () => (
   </svg>
 )
 
+
 const ShareIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="17" height="17" aria-hidden="true">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="15" height="15" aria-hidden="true">
     <circle cx="18" cy="5" r="3" />
     <circle cx="6" cy="12" r="3" />
     <circle cx="18" cy="19" r="3" />
@@ -42,6 +43,7 @@ const BlogDetail = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const posts = usePosts()
+  const loading = usePostsLoading()
 
   const post = posts.find((p) => p.id === id)
   const related = posts.filter((p) => p.id !== id)
@@ -62,6 +64,29 @@ const BlogDetail = () => {
       ;['og:title', 'og:description', 'og:url', 'og:type', 'og:image'].forEach(removeMeta)
     }
   }, [post])
+
+  if (loading) return (
+    <Page>
+      <Container>
+        <TopRow>
+          <BackBtn onClick={() => navigate('/blog')}>
+            <BackIcon />
+            Back to Archive
+          </BackBtn>
+        </TopRow>
+        <Skeleton $h="300px" $radius="20px" $mb="1.75rem" />
+        <Skeleton $h="12px" $w="80px" $mb="0.9rem" />
+        <Skeleton $h="28px" $w="75%" $mb="0.6rem" />
+        <Skeleton $h="28px" $w="55%" $mb="1.25rem" />
+        <Skeleton $h="12px" $w="100px" $mb="2rem" />
+        <Skeleton $h="14px" $mb="0.75rem" />
+        <Skeleton $h="14px" $mb="0.75rem" />
+        <Skeleton $h="14px" $w="85%" $mb="0.75rem" />
+        <Skeleton $h="14px" $mb="0.75rem" />
+        <Skeleton $h="14px" $w="65%" $mb="0.75rem" />
+      </Container>
+    </Page>
+  )
 
   if (!post) return null
 
@@ -173,7 +198,7 @@ const BackBtn = styled.button`
 const ShareBtn = styled.button`
   background: none;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 50px;
   cursor: pointer;
   color: var(--secondary-color);
   display: flex;
@@ -182,11 +207,12 @@ const ShareBtn = styled.button`
   font-size: 0.88rem;
   font-family: 'DM Sans', sans-serif;
   padding: 0.45rem 0.85rem;
-  transition: color 150ms ease, border-color 150ms ease;
+  transition: color 20ms ease, border-color 20ms ease;
 
   &:hover {
-    color: var(--text-dark);
-    border-color: var(--text-dark);
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
   }
 `
 
@@ -287,6 +313,26 @@ const BodyListItem = styled.li`
   p {
     margin: 0;
   }
+`
+
+const shimmer = keyframes`
+  0% { background-position: -600px 0 }
+  100% { background-position: 600px 0 }
+`
+
+const Skeleton = styled.div`
+  height: ${({ $h }) => $h || '14px'};
+  width: ${({ $w }) => $w || '100%'};
+  border-radius: ${({ $radius }) => $radius || '6px'};
+  margin-bottom: ${({ $mb }) => $mb || '0'};
+  background: linear-gradient(
+    90deg,
+    var(--surface-color) 25%,
+    var(--border-color) 50%,
+    var(--surface-color) 75%
+  );
+  background-size: 600px 100%;
+  animation: ${shimmer} 1.4s ease infinite;
 `
 
 const ContinueSection = styled.div`
